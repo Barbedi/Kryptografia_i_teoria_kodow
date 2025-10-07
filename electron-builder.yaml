@@ -1,0 +1,12 @@
+appId: "com.bbednarek.kryptografia-i-teoria-kodow-projekt"
+productName: "Kryptografia i teoria kodów - projekt"
+copyright: "Copyright (c) 2025 Bartłomiej Bednarek"
+win:
+  target: ["dir", "portable", "zip"]
+  icon: "resources/icon.ico"
+linux:
+  target: ["dir", "appimage", "zip"]
+  icon: "resources/icon.png"
+mac:
+  target: ["dir", "dmg", "zip"]
+  icon: "resources/icon.icns"
