@@ -1,15 +1,21 @@
-import { contextBridge, ipcRenderer, IpcRendererEvent } from "electron";
+import { contextBridge, ipcRenderer } from "electron";
 
-contextBridge.exposeInMainWorld("electronAPI", {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  on: (
-    channel: string,
-    callback: (event: IpcRendererEvent, ...args: any[]) => void,
-  ) => {
-    ipcRenderer.on(channel, callback);
+console.log("✅ Preload działa — rejestruję API!");
+
+const api = {
+  rust: {
+    hello: () => {
+      console.log("🚀 Wywołano api.rust.hello()");
+      return ipcRenderer.invoke("rust:hello");
+    },
   },
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  send: (channel: string, args?: any) => {
-    ipcRenderer.send(channel, args);
+  file: {
+    test: () => {
+      console.log("📂 Wywołano api.file.test()");
+      return ipcRenderer.invoke("file:test");
+    },
   },
-});
+};
+
+contextBridge.exposeInMainWorld("api", api);
+console.log("✅ API zostało wystawione na window.api");

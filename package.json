@@ -5,7 +5,8 @@
   "main": "main/main.ts",
   "type": "module",
   "scripts": {
-    "dev": "concurrently -n \"NEXT,ELECTRON\" -c \"yellow,blue\" --kill-others \"next dev --turbopack\" \"electron .\"",
+    "build:preload": "tsc main/preload.ts --outDir main",
+    "dev": "npm run build:preload && concurrently -n \"NEXT,ELECTRON\" -c \"yellow,blue\" --kill-others \"next dev --turbopack\" \"electron .\"",
     "build": "next build && electron-builder",
     "start": "next start",
     "format": "prettier --write .",
@@ -31,6 +32,7 @@
     "eslint-config-next": "15.5.4",
     "prettier": "^3.6.2",
     "tailwindcss": "^4",
+    "ts-node": "^10.9.2",
     "typescript": "^5"
   }
 }
