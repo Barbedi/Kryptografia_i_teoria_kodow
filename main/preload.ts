@@ -1,21 +1,7 @@
 import { contextBridge, ipcRenderer } from "electron";
 
-console.log("✅ Preload działa — rejestruję API!");
-
-const api = {
-  rust: {
-    hello: () => {
-      console.log("🚀 Wywołano api.rust.hello()");
-      return ipcRenderer.invoke("rust:hello");
-    },
-  },
+contextBridge.exposeInMainWorld("api", {
   file: {
-    test: () => {
-      console.log("📂 Wywołano api.file.test()");
-      return ipcRenderer.invoke("file:test");
-    },
+    open: () => ipcRenderer.invoke("file:open"),
   },
-};
-
-contextBridge.exposeInMainWorld("api", api);
-console.log("✅ API zostało wystawione na window.api");
+});

@@ -1,8 +1,9 @@
-import { app, BrowserWindow, ipcMain } from "electron";
+import { app, BrowserWindow, ipcMain, dialog } from "electron";
 import serve from "electron-serve";
 import path from "path";
 import { fileURLToPath } from "url";
 import { createRequire } from "module";
+import fs from "fs/promises";
 
 const require = createRequire(import.meta.url);
 console.log("🦀 Ładuję Rust module...");
@@ -59,6 +60,21 @@ app.whenReady().then(() => {
   ipcMain.handle("file:test", async () => {
     console.log("📂 IPC file:test wywołany");
     return "🧩 Testowe API działa!";
+  });
+
+  ipcMain.handle("file:open", async () => {
+    const { canceled, filePaths } = await dialog.showOpenDialog({
+      title: "Wybierz plik do szyfrowania",
+      filters: [{ name: "Text Files", extensions: ["txt"] }],
+      properties: ["openFile"],
+    });
+
+    if (canceled || filePaths.length === 0) return null;
+
+    const path = filePaths[0];
+    const content = await fs.readFile(path, "utf-8");
+
+    return { path, content };
   });
 
   createWindow();
