@@ -6,7 +6,7 @@ import { createRequire } from "module";
 import fs from "fs/promises";
 
 const require = createRequire(import.meta.url);
-console.log("🦀 Ładuję Rust module...");
+console.log("🦀 Ładuję moduł Rust...");
 const rust = require("../rust_module/index.node");
 console.log("✅ Rust module załadowany:", Object.keys(rust));
 
@@ -19,10 +19,10 @@ const appServe = app.isPackaged
 
 const createWindow = () => {
   const win = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1000,
+    height: 1000,
     webPreferences: {
-      preload: path.join(__dirname, "preload.js"), // Skompilowany z preload.ts
+      preload: path.join(__dirname, "preload.js"), 
       contextIsolation: true,
       nodeIntegration: false,
     },
@@ -39,33 +39,13 @@ const createWindow = () => {
   }
 };
 
-// 📡 Rejestracja IPC dla Rust + testowego API
 app.whenReady().then(() => {
-  console.log("🔧 Registering IPC handlers...");
-
-  // Rust API
-  ipcMain.handle("rust:hello", () => {
-    console.log("⚙️ Wywołano funkcję z Rust");
-    try {
-      const result = rust.helloWorld(); // dopasowane do eksportowanej funkcji
-      console.log("✅ Rust funkcja zwróciła:", result);
-      return result;
-    } catch (error) {
-      console.error("❌ Błąd przy wywołaniu Rust funkcji:", error);
-      throw error;
-    }
-  });
-
-  // Testowy handler do plików
-  ipcMain.handle("file:test", async () => {
-    console.log("📂 IPC file:test wywołany");
-    return "🧩 Testowe API działa!";
-  });
+  console.log("🔧 Rejestracja IPC handlerów...");
 
   ipcMain.handle("file:open", async () => {
     const { canceled, filePaths } = await dialog.showOpenDialog({
       title: "Wybierz plik do szyfrowania",
-      filters: [{ name: "Text Files", extensions: ["txt"] }],
+      filters: [{ name: "Pliki tekstowe", extensions: ["txt"] }],
       properties: ["openFile"],
     });
 
@@ -73,14 +53,22 @@ app.whenReady().then(() => {
 
     const path = filePaths[0];
     const content = await fs.readFile(path, "utf-8");
-
     return { path, content };
+  });
+
+  ipcMain.handle("rust:encryptCezar", (_event, text: string, shift: number) => {
+    console.log("⚙️ Wywołano rust.encryptCezar");
+    return rust.encryptCezar(text, shift);
+  });
+
+  ipcMain.handle("rust:decryptCezar", (_event, text: string, shift: number) => {
+    console.log("⚙️ Wywołano rust.decryptCezar");
+    return rust.decryptCezar(text, shift);
   });
 
   createWindow();
 });
 
-// 🔧 zamykanie aplikacji
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") app.quit();
 });

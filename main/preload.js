@@ -5,4 +5,12 @@ electron_1.contextBridge.exposeInMainWorld("api", {
     file: {
         open: function () { return electron_1.ipcRenderer.invoke("file:open"); },
     },
+    rust: {
+        encryptCezar: function (text, shift) {
+            return electron_1.ipcRenderer.invoke("rust:encryptCezar", text, shift);
+        },
+        decryptCezar: function (text, shift) {
+            return electron_1.ipcRenderer.invoke("rust:decryptCezar", text, shift);
+        },
+    },
 });

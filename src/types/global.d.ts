@@ -7,7 +7,8 @@ declare global {
         open: () => Promise<{ path: string; content: string } | null>;
       };
       rust: {
-        hello: () => Promise<string>;
+        encryptCezar: (text: string, shift: number) => Promise<string>;
+        decryptCezar: (text: string, shift: number) => Promise<string>;
       };
     };
   }
