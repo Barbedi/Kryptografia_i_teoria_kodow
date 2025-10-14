@@ -1,0 +1,15 @@
+[package]
+name = "rust_module"
+version = "0.1.0"
+edition = "2024"
+build = "build.rs"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+napi = { version = "3", features = ["napi6"] }
+napi-derive = "3"
+
+[build-dependencies]
+napi-build = "2.2.3"

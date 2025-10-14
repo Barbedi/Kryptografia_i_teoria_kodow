@@ -1,15 +1,13 @@
-import { contextBridge, ipcRenderer, IpcRendererEvent } from "electron";
+import { contextBridge, ipcRenderer } from "electron";
 
-contextBridge.exposeInMainWorld("electronAPI", {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  on: (
-    channel: string,
-    callback: (event: IpcRendererEvent, ...args: any[]) => void,
-  ) => {
-    ipcRenderer.on(channel, callback);
+contextBridge.exposeInMainWorld("api", {
+  file: {
+    open: () => ipcRenderer.invoke("file:open"),
   },
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  send: (channel: string, args?: any) => {
-    ipcRenderer.send(channel, args);
+  rust: {
+    encryptCezar: (text: string, shift: number) =>
+      ipcRenderer.invoke("rust:encryptCezar", text, shift),
+    decryptCezar: (text: string, shift: number) =>
+      ipcRenderer.invoke("rust:decryptCezar", text, shift),
   },
 });

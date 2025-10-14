@@ -5,7 +5,8 @@
   "main": "main/main.ts",
   "type": "module",
   "scripts": {
-    "dev": "concurrently -n \"NEXT,ELECTRON\" -c \"yellow,blue\" --kill-others \"next dev --turbopack\" \"electron .\"",
+    "build:preload": "tsc main/preload.ts --outDir main",
+    "dev": "npm run build:preload && concurrently -n \"NEXT,ELECTRON\" -c \"yellow,blue\" --kill-others \"next dev --turbopack\" \"electron .\"",
     "build": "next build && electron-builder",
     "start": "next start",
     "format": "prettier --write .",
@@ -13,6 +14,9 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^7.3.4",
     "electron-serve": "^3.0.0",
     "next": "15.5.4",
     "react": "19.1.0",
@@ -31,6 +35,7 @@
     "eslint-config-next": "15.5.4",
     "prettier": "^3.6.2",
     "tailwindcss": "^4",
+    "ts-node": "^10.9.2",
     "typescript": "^5"
   }
 }

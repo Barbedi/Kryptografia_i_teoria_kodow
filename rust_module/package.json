@@ -1,0 +1,22 @@
+{
+  "name": "rust_module",
+  "version": "1.0.0",
+  "license": "ISC",
+  "author": "Bartłomiej Bednarek",
+  "type": "module",
+  "main": "index.js",
+  "napi": {
+    "name": "index",
+    "triples": [
+      "x86_64-pc-windows-msvc",
+      "x86_64-unknown-linux-gnu",
+      "x86_64-apple-darwin"
+    ]
+  },
+  "scripts": {
+    "build": "napi build --release"
+  },
+  "devDependencies": {
+    "@napi-rs/cli": "^3.0.0"
+  }
+}
