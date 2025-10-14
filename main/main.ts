@@ -6,9 +6,8 @@ import { createRequire } from "module";
 import fs from "fs/promises";
 
 const require = createRequire(import.meta.url);
-console.log("🦀 Ładuję moduł Rust...");
 const rust = require("../rust_module/index.node");
-console.log("✅ Rust module załadowany:", Object.keys(rust));
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -40,7 +39,6 @@ const createWindow = () => {
 };
 
 app.whenReady().then(() => {
-  console.log("🔧 Rejestracja IPC handlerów...");
 
   ipcMain.handle("file:open", async () => {
     const { canceled, filePaths } = await dialog.showOpenDialog({
@@ -57,12 +55,10 @@ app.whenReady().then(() => {
   });
 
   ipcMain.handle("rust:encryptCezar", (_event, text: string, shift: number) => {
-    console.log("⚙️ Wywołano rust.encryptCezar");
     return rust.encryptCezar(text, shift);
   });
 
   ipcMain.handle("rust:decryptCezar", (_event, text: string, shift: number) => {
-    console.log("⚙️ Wywołano rust.decryptCezar");
     return rust.decryptCezar(text, shift);
   });
 

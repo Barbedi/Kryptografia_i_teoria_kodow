@@ -9,35 +9,27 @@ export default function CezarPage() {
   const [fileContent, setFileContent] = useState<string | null>(null);
   const [shift, setShift] = useState<number>(3);
 
-  // 📂 otwieranie pliku
   const handleOpenFile = async () => {
     const result = await window.api.file.open();
     if (!result) return;
     setFileName(result.path.split("\\").pop() ?? "nieznany");
     setFileContent(result.content);
-    console.log("📂 Plik otwarty:", result.path);
   };
-
-  // 🔢 zmiana przesunięcia
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = Math.min(25, Math.max(0, parseInt(e.target.value) || 0));
     setShift(value);
   };
 
-  // 🔒 szyfrowanie
   const handleEncrypt = async () => {
     if (!fileContent) return;
     const result = await window.api.rust.encryptCezar(fileContent, shift);
     setFileContent(result);
-    console.log("🔒 Zaszyfrowany tekst:", result);
   };
 
-  // 🔓 deszyfrowanie
   const handleDecrypt = async () => {
     if (!fileContent) return;
     const result = await window.api.rust.decryptCezar(fileContent, shift);
     setFileContent(result);
-    console.log("🔓 Odszyfrowany tekst:", result);
   };
 
   return (
