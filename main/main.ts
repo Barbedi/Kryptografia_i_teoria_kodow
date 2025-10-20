@@ -61,6 +61,12 @@ app.whenReady().then(() => {
   ipcMain.handle("rust:decryptCezar", (_event, text: string, shift: number) => {
     return rust.decryptCezar(text, shift);
   });
+  ipcMain.handle("rust:encryptVigenere", (_event, text: string, key: string) => {
+    return rust.encryptVigenere(text, key);
+  });
+  ipcMain.handle("rust:decryptVigenere", (_event, text: string, key: string) => {
+    return rust.decryptVigenere(text, key);
+  });
 
   createWindow();
 });

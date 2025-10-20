@@ -9,5 +9,9 @@ contextBridge.exposeInMainWorld("api", {
       ipcRenderer.invoke("rust:encryptCezar", text, shift),
     decryptCezar: (text: string, shift: number) =>
       ipcRenderer.invoke("rust:decryptCezar", text, shift),
+    encryptVigenere: (text: string, key: string) =>
+      ipcRenderer.invoke("rust:encryptVigenere", text, key),
+    decryptVigenere: (text: string, key: string) =>
+      ipcRenderer.invoke("rust:decryptVigenere", text, key),
   },
 });

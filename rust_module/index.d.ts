@@ -2,4 +2,8 @@
 /* eslint-disable */
 export declare function decryptCezar(text: string, shift: number): string
 
+export declare function decryptVigenere(text: string, key: string): string
+
 export declare function encryptCezar(text: string, shift: number): string
+
+export declare function encryptVigenere(text: string, key: string): string

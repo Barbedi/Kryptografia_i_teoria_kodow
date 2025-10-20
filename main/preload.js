@@ -12,5 +12,11 @@ electron_1.contextBridge.exposeInMainWorld("api", {
         decryptCezar: function (text, shift) {
             return electron_1.ipcRenderer.invoke("rust:decryptCezar", text, shift);
         },
+        encryptVigenere: function (text, key) {
+            return electron_1.ipcRenderer.invoke("rust:encryptVigenere", text, key);
+        },
+        decryptVigenere: function (text, key) {
+            return electron_1.ipcRenderer.invoke("rust:decryptVigenere", text, key);
+        },
     },
 });
