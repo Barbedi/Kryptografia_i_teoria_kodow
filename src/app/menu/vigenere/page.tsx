@@ -3,6 +3,8 @@ import { useState } from "react";
 import Link from "next/dist/client/link";
 import LockIcon from "@mui/icons-material/Lock";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
+import DeleteIcon from "@mui/icons-material/Delete";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 export default function CezarPage() {
   const [fileName, setFileName] = useState<string | null>(null);
@@ -29,6 +31,11 @@ export default function CezarPage() {
     if (!fileContent) return;
     const result = await window.api.rust.decryptVigenere(fileContent, key);
     setFileContent(result);
+  };
+  const handleClenanup = async () => {
+    setFileContent(null);
+    setFileName(null);
+    setKey("");
   };
 
   return (
@@ -70,7 +77,10 @@ export default function CezarPage() {
                        border border-white/20 rounded-3xl transition-all duration-300 
                        hover:bg-white/25 hover:scale-105 focus:shadow-lg hover:shadow-2xl flex flex-col justify-center items-center"
           >
-            <LockIcon sx={{ fontSize: 45 }} className="mb-3 text-white drop-shadow-md" />
+            <LockIcon
+              sx={{ fontSize: 45 }}
+              className="mb-3 text-white drop-shadow-md"
+            />
             <span className="text-2xl font-semibold">Szyfruj</span>
           </div>
 
@@ -80,13 +90,18 @@ export default function CezarPage() {
                        border border-white/20 rounded-3xl transition-all duration-300 
                        hover:bg-white/25 hover:scale-105 focus:shadow-lg hover:shadow-2xl flex flex-col justify-center items-center"
           >
-            <LockOpenIcon sx={{ fontSize: 45 }} className="mb-3 text-white drop-shadow-md" />
+            <LockOpenIcon
+              sx={{ fontSize: 45 }}
+              className="mb-3 text-white drop-shadow-md"
+            />
             <span className="text-2xl font-semibold">Odszyfruj</span>
           </div>
         </div>
         <p className="text-white text-lg mt-4">4. Wynik:</p>
-        <div className="w-full h-48 bg-white/30 border border-white/20 text-white rounded-3xl backdrop-blur-md 
-                        hover:bg-white/25 transition-all duration-300 shadow-lg hover:shadow-2xl flex flex-col items-center justify-center">
+        <div
+          className="w-full h-48 bg-white/30 border border-white/20 text-white rounded-3xl backdrop-blur-md 
+                        hover:bg-white/25 transition-all duration-300 shadow-lg hover:shadow-2xl flex flex-col items-center justify-center"
+        >
           <textarea
             readOnly
             value={fileContent ?? "Brak danych do wyświetlenia."}
@@ -94,14 +109,26 @@ export default function CezarPage() {
           />
         </div>
       </div>
-      <Link
-        href="/menu"
-        className="inline-block mt-6 px-8 py-3 bg-white/30 border border-white/20 backdrop-blur-md 
+      <div className="flex gap-4">
+        <Link
+          href="/menu"
+          className="inline-block mt-4 px-6 py-2 bg-white/30 border border-white/20 backdrop-blur-md 
                    text-white rounded-2xl hover:bg-white/25 hover:scale-105 active:scale-95 
                    duration-300 transition-all hover:shadow-xl shadow-white/50"
-      >
-        Powrót
-      </Link>
+        >
+          <ArrowBackIcon className="inline-block mr-0.5 mb-1" />
+          Powrót
+        </Link>
+        <button
+          onClick={handleClenanup}
+          className="mt-4 px-6 py-2 bg-red-600/30 border border-red-600/20 backdrop-blur-md 
+                     text-white rounded-2xl hover:bg-red-600/40 hover:scale-105 active:scale-95 
+                     duration-300 transition-all hover:shadow-xl shadow-red-500/50"
+        >
+          <DeleteIcon className="inline-block mr-0.5 mb-1" />
+          Wyczyść
+        </button>
+      </div>
     </div>
   );
 }

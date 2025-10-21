@@ -8,7 +8,6 @@ import fs from "fs/promises";
 const require = createRequire(import.meta.url);
 const rust = require("../rust_module/index.node");
 
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -21,7 +20,7 @@ const createWindow = () => {
     width: 1000,
     height: 1000,
     webPreferences: {
-      preload: path.join(__dirname, "preload.js"), 
+      preload: path.join(__dirname, "preload.js"),
       contextIsolation: true,
       nodeIntegration: false,
     },
@@ -39,7 +38,6 @@ const createWindow = () => {
 };
 
 app.whenReady().then(() => {
-
   ipcMain.handle("file:open", async () => {
     const { canceled, filePaths } = await dialog.showOpenDialog({
       title: "Wybierz plik do szyfrowania",
@@ -61,12 +59,30 @@ app.whenReady().then(() => {
   ipcMain.handle("rust:decryptCezar", (_event, text: string, shift: number) => {
     return rust.decryptCezar(text, shift);
   });
-  ipcMain.handle("rust:encryptVigenere", (_event, text: string, key: string) => {
-    return rust.encryptVigenere(text, key);
-  });
-  ipcMain.handle("rust:decryptVigenere", (_event, text: string, key: string) => {
-    return rust.decryptVigenere(text, key);
-  });
+  ipcMain.handle(
+    "rust:encryptVigenere",
+    (_event, text: string, key: string) => {
+      return rust.encryptVigenere(text, key);
+    },
+  );
+  ipcMain.handle(
+    "rust:decryptVigenere",
+    (_event, text: string, key: string) => {
+      return rust.decryptVigenere(text, key);
+    },
+  );
+  ipcMain.handle(
+    "rust:encrypt_running_key",
+    (_event, text: string, key: string) => {
+      return rust.encryptRunningKey(text, key);
+    },
+  );
+  ipcMain.handle(
+    "rust:decrypt_running_key",
+    (_event, text: string, key: string) => {
+      return rust.decryptRunningKey(text, key);
+    },
+  );
 
   createWindow();
 });
