@@ -9,6 +9,10 @@ declare global {
       rust: {
         encryptCezar: (text: string, shift: number) => Promise<string>;
         decryptCezar: (text: string, shift: number) => Promise<string>;
+        encryptVigenere: (text: string, key: string) => Promise<string>;
+        decryptVigenere: (text: string, key: string) => Promise<string>;
+        encrypt_running_key: (text: string, key: string) => Promise<string>;
+        decrypt_running_key: (text: string, key: string) => Promise<string>;
       };
     };
   }

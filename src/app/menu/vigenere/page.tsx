@@ -9,7 +9,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 export default function CezarPage() {
   const [fileName, setFileName] = useState<string | null>(null);
   const [fileContent, setFileContent] = useState<string | null>(null);
-  const [shift, setShift] = useState<number>(3);
+  const [key, setKey] = useState<string>("");
 
   const handleOpenFile = async () => {
     const result = await window.api.file.open();
@@ -18,31 +18,30 @@ export default function CezarPage() {
     setFileContent(result.content);
   };
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = Math.min(25, Math.max(0, parseInt(e.target.value) || 0));
-    setShift(value);
+    setKey(e.target.value);
   };
 
   const handleEncrypt = async () => {
     if (!fileContent) return;
-    const result = await window.api.rust.encryptCezar(fileContent, shift);
+    const result = await window.api.rust.encryptVigenere(fileContent, key);
     setFileContent(result);
   };
 
   const handleDecrypt = async () => {
     if (!fileContent) return;
-    const result = await window.api.rust.decryptCezar(fileContent, shift);
+    const result = await window.api.rust.decryptVigenere(fileContent, key);
     setFileContent(result);
   };
   const handleClenanup = async () => {
     setFileContent(null);
     setFileName(null);
-    setShift(3);
+    setKey("");
   };
 
   return (
     <div className="flex flex-col items-center justify-center mx-4">
       <h1 className="mt-5 text-xl md:text-2xl font-bold text-white drop-shadow-lg">
-        Szyfr Cezara
+        Szyfr Vigenère&apos;a
       </h1>
       <div className="w-96 h-0.5 bg-white/40 mt-1 mb-6 rounded-2xl"></div>
 
@@ -60,16 +59,12 @@ export default function CezarPage() {
         {fileName && (
           <p className="text-gray-300 text-sm">📄 Wybrano: {fileName}</p>
         )}
-        <p className="text-white text-lg mb-2 mt-3">
-          2. Wprowadź przesunięcie:
-        </p>
+        <p className="text-white text-lg mb-2 mt-3">2. Wprowadz klucz:</p>
         <input
-          type="number"
-          min="0"
-          max="25"
-          value={shift}
+          type="text"
+          value={key}
           onChange={handleChange}
-          placeholder="Podaj liczbę przesunięcia (np. 3)"
+          placeholder="Podaj klucz (np. 'tajny')"
           className="w-full py-3 px-4 rounded-3xl bg-white/30 text-white placeholder-white/70 
                      backdrop-blur-md border border-white/20 focus:outline-none transition-all duration-300 
                      focus:shadow-lg hover:shadow-lg hover:scale-105 focus:scale-105 text-center shadow-white/50"
