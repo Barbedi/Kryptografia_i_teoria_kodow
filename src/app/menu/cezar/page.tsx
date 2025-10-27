@@ -5,11 +5,13 @@ import LockIcon from "@mui/icons-material/Lock";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { useEffect } from "react";
 
 export default function CezarPage() {
   const [fileName, setFileName] = useState<string | null>(null);
   const [fileContent, setFileContent] = useState<string | null>(null);
-  const [shift, setShift] = useState<number>(3);
+  const [shift, setShift] = useState<number>(0);
+  const [error, setError] = useState<string | null>(null);
 
   const handleOpenFile = async () => {
     const result = await window.api.file.open();
@@ -17,11 +19,6 @@ export default function CezarPage() {
     setFileName(result.path.split("\\").pop() ?? "nieznany");
     setFileContent(result.content);
   };
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = Math.min(25, Math.max(0, parseInt(e.target.value) || 0));
-    setShift(value);
-  };
-
   const handleEncrypt = async () => {
     if (!fileContent) return;
     const result = await window.api.rust.encryptCezar(fileContent, shift);
@@ -38,6 +35,17 @@ export default function CezarPage() {
     setFileName(null);
     setShift(3);
   };
+  const validateKey = (value: number) => {
+    setShift(value);
+    if (value === 0) {
+      setError("Podaj klucz przesunięcia większy od 0.");
+    } else {
+      setError(null);
+    }
+  };
+  useEffect(() => {
+    validateKey(shift); 
+  },);
 
   return (
     <div className="flex flex-col items-center justify-center mx-4">
@@ -58,29 +66,37 @@ export default function CezarPage() {
         </button>
 
         {fileName && (
-          <p className="text-gray-300 text-sm">📄 Wybrano: {fileName}</p>
+          <p className="text-gray-300 text-sm">Wybrano: {fileName}</p>
         )}
         <p className="text-white text-lg mb-2 mt-3">
-          2. Wprowadź przesunięcie:
+          2. Wprowadź przesunięcie...
         </p>
         <input
           type="number"
-          min="0"
+          min="1"
           max="25"
           value={shift}
-          onChange={handleChange}
+          onChange={(e) => validateKey(Number(e.target.value))}
           placeholder="Podaj liczbę przesunięcia (np. 3)"
-          className="w-full py-3 px-4 rounded-3xl bg-white/30 text-white placeholder-white/70 
-                     backdrop-blur-md border border-white/20 focus:outline-none transition-all duration-300 
-                     focus:shadow-lg hover:shadow-lg hover:scale-105 focus:scale-105 text-center shadow-white/50"
+          className={`w-full py-3 px-4 rounded-3xl bg-white/30 text-white placeholder-white/70 
+                      backdrop-blur-md border ${error ? "border-red-500" : "border-white/20"} 
+                      focus:outline-none transition-all duration-300 
+                      focus:shadow-lg hover:shadow-lg hover:scale-105 focus:scale-105 
+                      text-center shadow-white/50`}
         />
+
+        {error && (
+          <p className="text-red-400 text-sm ">{error}</p>
+        )}
         <p className="text-white text-lg mt-4">3. Co zrobić:</p>
         <div className="flex flex-row gap-6">
           <div
-            onClick={handleEncrypt}
-            className="cursor-pointer w-48 h-48 bg-white/30 text-white backdrop-blur-md 
-                       border border-white/20 rounded-3xl transition-all duration-300 
-                       hover:bg-white/25 hover:scale-105 focus:shadow-lg hover:shadow-2xl flex flex-col justify-center items-center"
+            onClick={!error ? handleEncrypt : undefined}
+            className={`cursor-pointer w-48 h-48 ${
+              error ? "opacity-50 cursor-not-allowed" : "hover:scale-105"
+            } bg-white/30 text-white backdrop-blur-md 
+              border border-white/20 rounded-3xl transition-all duration-300 
+              hover:bg-white/25 flex flex-col justify-center items-center`}
           >
             <LockIcon
               sx={{ fontSize: 45 }}
@@ -90,10 +106,12 @@ export default function CezarPage() {
           </div>
 
           <div
-            onClick={handleDecrypt}
-            className="cursor-pointer w-48 h-48 bg-white/30 text-white backdrop-blur-md 
-                       border border-white/20 rounded-3xl transition-all duration-300 
-                       hover:bg-white/25 hover:scale-105 focus:shadow-lg hover:shadow-2xl flex flex-col justify-center items-center"
+            onClick={!error ? handleDecrypt : undefined}
+            className={`cursor-pointer w-48 h-48 ${
+              error ? "opacity-50 cursor-not-allowed" : "hover:scale-105"
+            } bg-white/30 text-white backdrop-blur-md 
+              border border-white/20 rounded-3xl transition-all duration-300 
+              hover:bg-white/25 flex flex-col justify-center items-center`}
           >
             <LockOpenIcon
               sx={{ fontSize: 45 }}

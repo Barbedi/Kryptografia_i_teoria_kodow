@@ -1,13 +1,12 @@
 "use client";
 import { useState } from "react";
-import Link from "next/dist/client/link";
+import Link from "next/link";
 import LockIcon from "@mui/icons-material/Lock";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { useEffect } from "react";
 
-export default function CezarPage() {
+const AesPage = () => {
   const [fileName, setFileName] = useState<string | null>(null);
   const [fileContent, setFileContent] = useState<string | null>(null);
   const [key, setKey] = useState<string>("");
@@ -19,38 +18,39 @@ export default function CezarPage() {
     setFileName(result.path.split("\\").pop() ?? "nieznany");
     setFileContent(result.content);
   };
-  const handleEncrypt = async () => {
-    if (!fileContent) return;
-    const result = await window.api.rust.encryptVigenere(fileContent, key);
-    setFileContent(result);
-  };
 
-  const handleDecrypt = async () => {
-    if (!fileContent) return;
-    const result = await window.api.rust.decryptVigenere(fileContent, key);
-    setFileContent(result);
-  };
-  const handleClenanup = async () => {
-    setFileContent(null);
-    setFileName(null);
-    setKey("");
-  };
   const validateKey = (value: string) => {
     setKey(value);
-    if (value.length === 0) {
-      setError("Trzeba podać klucz.");
+    if (![16, 24, 32].includes(value.length)) {
+      setError("Klucz musi mieć długość 16 znaków.");
     } else {
       setError(null);
     }
   };
-  useEffect(() => {
-    validateKey(key); 
-  }, );
+
+  const handleEncrypt = async () => {
+    if (!fileContent || error) return;
+    const result = await window.api.rust.encryptAes(fileContent, key);
+    setFileContent(result);
+  };
+
+  const handleDecrypt = async () => {
+    if (!fileContent || error) return;
+    const result = await window.api.rust.decryptAes(fileContent, key);
+    setFileContent(result);
+  };
+
+  const handleCleanup = () => {
+    setFileContent(null);
+    setFileName(null);
+    setKey("");
+    setError(null);
+  };
 
   return (
     <div className="flex flex-col items-center justify-center mx-4">
       <h1 className="mt-5 text-xl md:text-2xl font-bold text-white drop-shadow-lg">
-        Szyfr Vigenère&apos;a
+        Szyfr AES
       </h1>
       <div className="w-96 h-0.5 bg-white/40 mt-1 mb-6 rounded-2xl"></div>
 
@@ -68,22 +68,24 @@ export default function CezarPage() {
         {fileName && (
           <p className="text-gray-300 text-sm">Wybrano: {fileName}</p>
         )}
-        <p className="text-white text-lg mb-2 mt-3">2. Wprowadz klucz:</p>
+
+        <p className="text-white text-lg mb-2 mt-3">
+          2. Podaj klucz (16 znaków):
+        </p>
         <input
           type="text"
           value={key}
           onChange={(e) => validateKey(e.target.value)}
-          placeholder="Podaj klucz (np. 'tajny')"
-          className={`w-full py-3 px-4 rounded-3xl bg-white/30 text-white placeholder-white/70 
-            backdrop-blur-md border ${error ? "border-red-500" : "border-white/20"} 
-            focus:outline-none transition-all duration-300 
-            focus:shadow-lg hover:shadow-lg hover:scale-105 focus:scale-105 
-            text-center shadow-white/50`}
-      />
-
+          placeholder="Wpisz klucz AES..."
+          className={`w-full py-3 px-4 rounded-3xl text-center bg-white/30 text-white placeholder-white/70 
+                      backdrop-blur-md border ${error ? "border-red-500" : "border-white/20"} 
+                      focus:outline-none transition-all duration-300 
+                      focus:shadow-lg hover:shadow-lg hover:scale-105 focus:scale-105 shadow-white/50`}
+        />
         {error && (
-        <p className="text-red-400 text-sm ">{error}</p>
+          <p className="text-red-400 text-sm -mt-2">{error}</p>
         )}
+
         <p className="text-white text-lg mt-4">3. Co zrobić:</p>
         <div className="flex flex-row gap-6">
           <div
@@ -116,6 +118,7 @@ export default function CezarPage() {
             <span className="text-2xl font-semibold">Odszyfruj</span>
           </div>
         </div>
+
         <p className="text-white text-lg mt-4">4. Wynik:</p>
         <div
           className="w-full h-48 bg-white/30 border border-white/20 text-white rounded-3xl backdrop-blur-md 
@@ -128,6 +131,7 @@ export default function CezarPage() {
           />
         </div>
       </div>
+
       <div className="flex gap-4">
         <Link
           href="/menu"
@@ -139,7 +143,7 @@ export default function CezarPage() {
           Powrót
         </Link>
         <button
-          onClick={handleClenanup}
+          onClick={handleCleanup}
           className="mt-4 px-6 py-2 bg-red-600/30 border border-red-600/20 backdrop-blur-md 
                      text-white rounded-2xl hover:bg-red-600/40 hover:scale-105 active:scale-95 
                      duration-300 transition-all hover:shadow-xl shadow-red-500/50"
@@ -150,4 +154,6 @@ export default function CezarPage() {
       </div>
     </div>
   );
-}
+};
+
+export default AesPage;

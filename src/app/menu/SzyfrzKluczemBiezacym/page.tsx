@@ -57,7 +57,7 @@ export default function CezarPage() {
         </button>
 
         {fileName && (
-          <p className="text-gray-300 text-sm">📄 Wybrano: {fileName}</p>
+          <p className="text-gray-300 text-sm">Wybrano: {fileName}</p>
         )}
         <p className="text-white text-lg mb-2 mt-3">2. Wprowadz klucz:</p>
         <input
