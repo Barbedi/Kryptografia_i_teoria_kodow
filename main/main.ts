@@ -83,6 +83,18 @@ app.whenReady().then(() => {
       return rust.decryptRunningKey(text, key);
     },
   );
+  ipcMain.handle(
+    "rust:encrypt_aes",
+    (_event, text: string, key: string) => {
+      return rust.encryptAes(text, key);
+    },
+  );
+  ipcMain.handle(
+    "rust:decrypt_aes",
+    (_event, text: string, key: string) => {
+      return rust.decryptAes(text, key);
+    },
+  );
 
   createWindow();
 });

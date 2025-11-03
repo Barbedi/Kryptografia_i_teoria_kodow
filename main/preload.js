@@ -24,5 +24,11 @@ electron_1.contextBridge.exposeInMainWorld("api", {
         decrypt_running_key: function (text, key) {
             return electron_1.ipcRenderer.invoke("rust:decrypt_running_key", text, key);
         },
+        encrypt_aes: function (text, key) {
+            return electron_1.ipcRenderer.invoke("rust:encrypt_aes", text, key);
+        },
+        decrypt_aes: function (text, key) {
+            return electron_1.ipcRenderer.invoke("rust:decrypt_aes", text, key);
+        },
     },
 });
