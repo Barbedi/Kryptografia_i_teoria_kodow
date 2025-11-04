@@ -8,6 +8,7 @@ build = "build.rs"
 crate-type = ["cdylib"]
 
 [dependencies]
+base64 = "0.22.1"
 napi = { version = "3", features = ["napi6"] }
 napi-derive = "3"
 
