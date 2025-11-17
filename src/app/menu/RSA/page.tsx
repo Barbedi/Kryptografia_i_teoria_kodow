@@ -1,58 +1,56 @@
 "use client";
+
 import { useState } from "react";
-import Link from "next/dist/client/link";
+import Link from "next/link";
 import LockIcon from "@mui/icons-material/Lock";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { useEffect } from "react";
 
 const RSAPage = () => {
-  const [fileName, setFileName] = useState<string | null>(null);
-  const [fileContent, setFileContent] = useState<string | null>(null);
-  const [shift, setShift] = useState<number>(0);
-  const [error, setError] = useState<string | null>(null);
-  const [keymode, setKeymode] = useState<"file" | "text">("text");
+  const [publicKey, setPublicKey] = useState("");
+  const [privateKey, setPrivateKey] = useState("");
+
   const [showGeneratedKeys, setShowGeneratedKeys] = useState(false);
-  const handleOpenFile = async () => {
-    const result = await window.api.file.open();
-    if (!result) return;
-    setFileName(result.path.split("\\").pop() ?? "nieznany");
-    setFileContent(result.content);
-  };
-  const handleEncrypt = async () => {
-    if (!fileContent) return;
-    const result = await window.api.rust.encryptCezar(fileContent, shift);
-    setFileContent(result);
-  };
-
-  const handleDecrypt = async () => {
-    if (!fileContent) return;
-    const result = await window.api.rust.decryptCezar(fileContent, shift);
-    setFileContent(result);
-  };
-  const handleClenanup = async () => {
-     setFileContent(null);
-  setFileName(null);
-  setShift(3);                
-  setShowGeneratedKeys(false); 
-
-  };
-  const validateKey = (value: number) => {
-    setShift(value);
-    if (value === 0) {
-      setError("Podaj klucz przesunięcia większy od 0.");
-    } else {
-      setError(null);
-    }
-  };
-  useEffect(() => {
-    validateKey(shift);
-  });
+  const [keyMode, setKeyMode] = useState<"text" | "generate">("text");
+  const [message, setMessage] = useState("");
+  const [result, setResult] = useState("");
 
   const generateKeys = () => {
-    setShowGeneratedKeys(true); 
+    const examplePublic = "65537, 3233";
+    const examplePrivate = "2753, 3233";
+
+    setPublicKey(examplePublic);
+    setPrivateKey(examplePrivate);
+    setShowGeneratedKeys(true);
   };
+
+  const handleEncrypt = () => {
+    if (!message || !publicKey) {
+      setResult("Błąd: brak danych lub klucza publicznego.");
+      return;
+    }
+
+    setResult("SZYFROGRAM (mock RSA)");
+  };
+
+  const handleDecrypt = () => {
+    if (!message || !privateKey) {
+      setResult("Błąd: brak danych lub klucza prywatnego.");
+      return;
+    }
+
+    setResult("ODSZYFROWANY TEKST (mock RSA)");
+  };
+
+  const handleCleanup = () => {
+    setPublicKey("");
+    setPrivateKey("");
+    setMessage("");
+    setResult("");
+    setShowGeneratedKeys(false);
+  };
+
   return (
     <div className="flex flex-col items-center justify-center mx-4">
       <h1 className="mt-5 text-xl md:text-2xl font-bold text-white drop-shadow-lg">
@@ -62,169 +60,151 @@ const RSAPage = () => {
 
       <div className="flex flex-col items-center gap-4 w-full max-w-md">
         <p className="text-white text-lg">1. Klucze:</p>
+
         <div className="flex gap-4">
           <button
-            onClick={() => setKeymode("text")}
-            className={`px-6 py-2 text-white rounded-2xl ${keymode === "text" ? "bg-white/40 border-2 border-white/60" : "bg-white/20"}`}
+            onClick={() => setKeyMode("text")}
+            className={`px-6 py-2 text-white rounded-2xl ${
+              keyMode === "text"
+                ? "bg-white/40 border-2 border-white/60"
+                : "bg-white/20"
+            }`}
           >
             Wpisz klucze
           </button>
+
           <button
-            onClick={() => setKeymode("file")}
-            className={`px-6 py-2 text-white rounded-2xl ${keymode === "file" ? "bg-white/40 border-2 border-white/60" : "bg-white/20"}`}
+            onClick={() => setKeyMode("generate")}
+            className={`px-6 py-2 text-white rounded-2xl ${
+              keyMode === "generate"
+                ? "bg-white/40 border-2 border-white/60"
+                : "bg-white/20"
+            }`}
           >
             Wygeneruj klucze
           </button>
         </div>
-        {keymode === "text" ? (
+        {keyMode === "text" && (
           <>
             <p className="text-white text-lg mt-3">Wpisz klucze:</p>
+
             <div className="flex flex-row gap-4">
               <input
-                className="w-full py-3 px-4 rounded-3xl bg-white/30 text-white placeholder-white/70 backdrop-blur-md 
-                     border border-white/20 focus:outline-none transition-all duration-300 
-                     hover:shadow-xl hover:scale-105 focus:shadow-2xl shadow-white/50"
-                placeholder="Klucz publiczny"
+                value={publicKey}
+                onChange={(e) => setPublicKey(e.target.value)}
+                className="w-full py-3 px-4 rounded-3xl bg-white/30 text-white placeholder-white/70 
+                     backdrop-blur-md border border-white/20 transition-all duration-300 
+                     hover:shadow-xl hover:scale-105"
+                placeholder="Klucz publiczny "
                 type="text"
               />
+
               <input
-                className="w-full py-3 px-4 rounded-3xl bg-white/30 text-white placeholder-white/70 backdrop-blur-md 
-                     border border-white/20 focus:outline-none transition-all duration-300 
-                     hover:shadow-xl hover:scale-105 focus:shadow-2xl shadow-white/50"
-                placeholder="Klucz prywatny"
+                value={privateKey}
+                onChange={(e) => setPrivateKey(e.target.value)}
+                className="w-full py-3 px-4 rounded-3xl bg-white/30 text-white placeholder-white/70 
+                     backdrop-blur-md border border-white/20 transition-all duration-300 
+                     hover:shadow-xl hover:scale-105"
+                placeholder="Klucz prywatny "
                 type="text"
               />
-            </div>
-          </>
-        ) : (
-          <>
-            <div className="flex flex-col w-full gap-4">
-              {!showGeneratedKeys && (
-                <button
-                  onClick={generateKeys}
-                  className="w-full py-3 px-4 bg-white/30 rounded-3xl text-white hover:bg-white/40 
-                 transition-all duration-300 hover:scale-105"
-                >
-                  Generuj klucze...
-                </button>
-              )}
-              {showGeneratedKeys && (
-                <div className="flex flex-col gap-4 w-full">
-                  <p className="text-white text-center">Wygenerowane klucze:</p>
-
-                  <div className="flex flex-row gap-4">
-                    <input
-                      readOnly
-                      className="w-full py-3 px-4 rounded-3xl bg-white/30 text-white placeholder-white/70 
-                     backdrop-blur-md border border-white/20 focus:outline-none transition-all duration-300 
-                     hover:shadow-xl hover:scale-105 focus:shadow-2xl shadow-white/50"
-                      placeholder="Klucz publiczny"
-                    />
-
-                    <input
-                      readOnly
-                      className="w-full py-3 px-4 rounded-3xl bg-white/30 text-white placeholder-white/70 
-                     backdrop-blur-md border border-white/20 focus:outline-none transition-all duration-300 
-                     hover:shadow-xl hover:scale-105 focus:shadow-2xl shadow-white/50"
-                      placeholder="Klucz prywatny"
-                    />
-                  </div>
-                </div>
-              )}
             </div>
           </>
         )}
-        {/* <button
-          onClick={handleOpenFile}
-          className="w-full py-3 px-4 rounded-3xl bg-white/30 text-white placeholder-white/70 backdrop-blur-md 
-                     border border-white/20 focus:outline-none transition-all duration-300 
-                     hover:shadow-xl hover:scale-105 focus:shadow-2xl shadow-white/50"
-        >
-          Wybierz plik
-        </button>
+        {keyMode === "generate" && (
+          <>
+            {!showGeneratedKeys && (
+              <button
+                onClick={generateKeys}
+                className="w-full py-3 px-4 bg-white/30 rounded-3xl text-white hover:bg-white/40 
+                   transition-all duration-300 hover:scale-105"
+              >
+                Generuj klucze...
+              </button>
+            )}
 
-        {fileName && (
-          <p className="text-gray-300 text-sm">Wybrano: {fileName}</p>
-        )} */}
-        <p className="text-white text-lg mb-2 mt-3">
-          2. Wprowadź przesunięcie...
-        </p>
-        <input
-          type="number"
-          min="1"
-          max="25"
-          value={shift}
-          onChange={(e) => validateKey(Number(e.target.value))}
-          placeholder="Podaj liczbę przesunięcia (np. 3)"
-          className={`w-full py-3 px-4 rounded-3xl bg-white/30 text-white placeholder-white/70 
-                      backdrop-blur-md border ${error ? "border-red-500" : "border-white/20"} 
-                      focus:outline-none transition-all duration-300 
-                      focus:shadow-lg hover:shadow-lg hover:scale-105 focus:scale-105 
-                      text-center shadow-white/50`}
+            {showGeneratedKeys && (
+              <div className="flex flex-col gap-4 w-full">
+                <p className="text-white text-center">Wygenerowane klucze:</p>
+
+                <div className="flex flex-row gap-4">
+                  <input
+                    readOnly
+                    value={publicKey}
+                    className="w-full py-3 px-4 rounded-3xl bg-white/30 text-white backdrop-blur-md"
+                  />
+
+                  <input
+                    readOnly
+                    value={privateKey}
+                    className="w-full py-3 px-4 rounded-3xl bg-white/30 text-white backdrop-blur-md"
+                  />
+                </div>
+              </div>
+            )}
+          </>
+        )}
+        <p className="text-white text-lg mt-4">2. Wiadomość:</p>
+
+        <textarea
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          placeholder="Wpisz tekst do zaszyfrowania lub szyfrogram..."
+          className="w-full min-h-[120px] p-4 bg-white/20 text-white rounded-3xl backdrop-blur-md 
+                     border border-white/20 resize-none focus:outline-none"
         />
-
-        {error && <p className="text-red-400 text-sm ">{error}</p>}
         <p className="text-white text-lg mt-4">3. Co zrobić:</p>
+
         <div className="flex flex-row gap-6">
           <div
-            onClick={!error ? handleEncrypt : undefined}
-            className={`cursor-pointer w-48 h-48 ${
-              error ? "opacity-50 cursor-not-allowed" : "hover:scale-105"
-            } bg-white/30 text-white backdrop-blur-md 
+            onClick={handleEncrypt}
+            className="cursor-pointer w-48 h-48 hover:scale-105 bg-white/30 text-white backdrop-blur-md 
               border border-white/20 rounded-3xl transition-all duration-300 
-              hover:bg-white/25 flex flex-col justify-center items-center`}
+              hover:bg-white/25 flex flex-col justify-center items-center"
           >
-            <LockIcon
-              sx={{ fontSize: 45 }}
-              className="mb-3 text-white drop-shadow-md"
-            />
+            <LockIcon sx={{ fontSize: 45 }} className="mb-3" />
             <span className="text-2xl font-semibold">Szyfruj</span>
           </div>
 
           <div
-            onClick={!error ? handleDecrypt : undefined}
-            className={`cursor-pointer w-48 h-48 ${
-              error ? "opacity-50 cursor-not-allowed" : "hover:scale-105"
-            } bg-white/30 text-white backdrop-blur-md 
+            onClick={handleDecrypt}
+            className="cursor-pointer w-48 h-48 hover:scale-105 bg-white/30 text-white backdrop-blur-md 
               border border-white/20 rounded-3xl transition-all duration-300 
-              hover:bg-white/25 flex flex-col justify-center items-center`}
+              hover:bg-white/25 flex flex-col justify-center items-center"
           >
-            <LockOpenIcon
-              sx={{ fontSize: 45 }}
-              className="mb-3 text-white drop-shadow-md"
-            />
+            <LockOpenIcon sx={{ fontSize: 45 }} className="mb-3" />
             <span className="text-2xl font-semibold">Odszyfruj</span>
           </div>
         </div>
         <p className="text-white text-lg mt-4">4. Wynik:</p>
+
         <div
-          className="w-full h-48 bg-white/30 border border-white/20 text-white rounded-3xl backdrop-blur-md 
-                        hover:bg-white/25 transition-all duration-300 shadow-lg hover:shadow-2xl flex flex-col items-center justify-center"
+          className="w-full h-48 bg-white/30 border border-white/20 text-white 
+                        rounded-3xl backdrop-blur-md"
         >
           <textarea
             readOnly
-            value={fileContent ?? "Brak danych do wyświetlenia."}
+            value={result || "Brak danych do wyświetlenia."}
             className="w-full h-full p-4 bg-transparent resize-none text-white outline-none"
           />
         </div>
       </div>
-      <div className="flex gap-4">
+      <div className="flex gap-4 mt-6">
         <Link
           href="/menu"
-          className="inline-block mt-4 px-6 py-2 bg-white/30 border border-white/20 backdrop-blur-md 
-                   text-white rounded-2xl hover:bg-white/25 hover:scale-105 active:scale-95 
-                   duration-300 transition-all hover:shadow-xl shadow-white/50"
+          className="px-6 py-2 bg-white/30 border border-white/20 backdrop-blur-md 
+                   text-white rounded-2xl hover:bg-white/25 hover:scale-105"
         >
-          <ArrowBackIcon className="inline-block mr-0.5 mb-1" />
+          <ArrowBackIcon className="inline-block mr-1 mb-1" />
           Powrót
         </Link>
+
         <button
-          onClick={handleClenanup}
-          className="mt-4 px-6 py-2 bg-red-600/30 border border-red-600/20 backdrop-blur-md 
-                     text-white rounded-2xl hover:bg-red-600/40 hover:scale-105 active:scale-95 
-                     duration-300 transition-all hover:shadow-xl shadow-red-500/50"
+          onClick={handleCleanup}
+          className="px-6 py-2 bg-red-600/30 border border-red-600/20 backdrop-blur-md 
+                     text-white rounded-2xl hover:bg-red-600/40 hover:scale-105"
         >
-          <DeleteIcon className="inline-block mr-0.5 mb-1" />
+          <DeleteIcon className="inline-block mr-1 mb-1" />
           Wyczyść
         </button>
       </div>
