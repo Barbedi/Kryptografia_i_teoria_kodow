@@ -7,12 +7,13 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useEffect } from "react";
 
-export default function CezarPage() {
+const RSAPage = () => {
   const [fileName, setFileName] = useState<string | null>(null);
   const [fileContent, setFileContent] = useState<string | null>(null);
   const [shift, setShift] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
-
+  const [keymode, setKeymode] = useState<"file" | "text">("text");
+  const [showGeneratedKeys, setShowGeneratedKeys] = useState(false);
   const handleOpenFile = async () => {
     const result = await window.api.file.open();
     if (!result) return;
@@ -31,9 +32,11 @@ export default function CezarPage() {
     setFileContent(result);
   };
   const handleClenanup = async () => {
-    setFileContent(null);
-    setFileName(null);
-    setShift(3);
+     setFileContent(null);
+  setFileName(null);
+  setShift(3);                
+  setShowGeneratedKeys(false); 
+
   };
   const validateKey = (value: number) => {
     setShift(value);
@@ -47,16 +50,91 @@ export default function CezarPage() {
     validateKey(shift);
   });
 
+  const generateKeys = () => {
+    setShowGeneratedKeys(true); 
+  };
   return (
     <div className="flex flex-col items-center justify-center mx-4">
       <h1 className="mt-5 text-xl md:text-2xl font-bold text-white drop-shadow-lg">
-        Szyfr Cezara
+        Szyfr RSA
       </h1>
       <div className="w-96 h-0.5 bg-white/40 mt-1 mb-6 rounded-2xl"></div>
 
       <div className="flex flex-col items-center gap-4 w-full max-w-md">
-        <p className="text-white text-lg">1. Wybierz plik:</p>
-        <button
+        <p className="text-white text-lg">1. Klucze:</p>
+        <div className="flex gap-4">
+          <button
+            onClick={() => setKeymode("text")}
+            className={`px-6 py-2 text-white rounded-2xl ${keymode === "text" ? "bg-white/40 border-2 border-white/60" : "bg-white/20"}`}
+          >
+            Wpisz klucze
+          </button>
+          <button
+            onClick={() => setKeymode("file")}
+            className={`px-6 py-2 text-white rounded-2xl ${keymode === "file" ? "bg-white/40 border-2 border-white/60" : "bg-white/20"}`}
+          >
+            Wygeneruj klucze
+          </button>
+        </div>
+        {keymode === "text" ? (
+          <>
+            <p className="text-white text-lg mt-3">Wpisz klucze:</p>
+            <div className="flex flex-row gap-4">
+              <input
+                className="w-full py-3 px-4 rounded-3xl bg-white/30 text-white placeholder-white/70 backdrop-blur-md 
+                     border border-white/20 focus:outline-none transition-all duration-300 
+                     hover:shadow-xl hover:scale-105 focus:shadow-2xl shadow-white/50"
+                placeholder="Klucz publiczny"
+                type="text"
+              />
+              <input
+                className="w-full py-3 px-4 rounded-3xl bg-white/30 text-white placeholder-white/70 backdrop-blur-md 
+                     border border-white/20 focus:outline-none transition-all duration-300 
+                     hover:shadow-xl hover:scale-105 focus:shadow-2xl shadow-white/50"
+                placeholder="Klucz prywatny"
+                type="text"
+              />
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="flex flex-col w-full gap-4">
+              {!showGeneratedKeys && (
+                <button
+                  onClick={generateKeys}
+                  className="w-full py-3 px-4 bg-white/30 rounded-3xl text-white hover:bg-white/40 
+                 transition-all duration-300 hover:scale-105"
+                >
+                  Generuj klucze...
+                </button>
+              )}
+              {showGeneratedKeys && (
+                <div className="flex flex-col gap-4 w-full">
+                  <p className="text-white text-center">Wygenerowane klucze:</p>
+
+                  <div className="flex flex-row gap-4">
+                    <input
+                      readOnly
+                      className="w-full py-3 px-4 rounded-3xl bg-white/30 text-white placeholder-white/70 
+                     backdrop-blur-md border border-white/20 focus:outline-none transition-all duration-300 
+                     hover:shadow-xl hover:scale-105 focus:shadow-2xl shadow-white/50"
+                      placeholder="Klucz publiczny"
+                    />
+
+                    <input
+                      readOnly
+                      className="w-full py-3 px-4 rounded-3xl bg-white/30 text-white placeholder-white/70 
+                     backdrop-blur-md border border-white/20 focus:outline-none transition-all duration-300 
+                     hover:shadow-xl hover:scale-105 focus:shadow-2xl shadow-white/50"
+                      placeholder="Klucz prywatny"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          </>
+        )}
+        {/* <button
           onClick={handleOpenFile}
           className="w-full py-3 px-4 rounded-3xl bg-white/30 text-white placeholder-white/70 backdrop-blur-md 
                      border border-white/20 focus:outline-none transition-all duration-300 
@@ -67,7 +145,7 @@ export default function CezarPage() {
 
         {fileName && (
           <p className="text-gray-300 text-sm">Wybrano: {fileName}</p>
-        )}
+        )} */}
         <p className="text-white text-lg mb-2 mt-3">
           2. Wprowadź przesunięcie...
         </p>
@@ -152,4 +230,6 @@ export default function CezarPage() {
       </div>
     </div>
   );
-}
+};
+
+export default RSAPage;

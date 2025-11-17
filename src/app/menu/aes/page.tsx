@@ -83,10 +83,15 @@ const AesPage = () => {
         ) : (
           <>
             <p className="text-white text-lg mt-3">2. Wybierz plik:</p>
-            <button onClick={handleOpenFile} className="w-full py-3 px-4 bg-white/30 rounded-3xl text-white">
+            <button
+              onClick={handleOpenFile}
+              className="w-full py-3 px-4 bg-white/30 rounded-3xl text-white"
+            >
               Wybierz plik
             </button>
-            {fileName && <p className="text-gray-300 text-sm">Wybrano: {fileName}</p>}
+            {fileName && (
+              <p className="text-gray-300 text-sm">Wybrano: {fileName}</p>
+            )}
           </>
         )}
 
@@ -96,14 +101,13 @@ const AesPage = () => {
           value={key}
           placeholder="Podaj klucz AES"
           onChange={(e) => validateKey(e.target.value)}
-           className={`w-full py-3 px-4 rounded-3xl bg-white/30 text-white placeholder-white/70 
+          className={`w-full py-3 px-4 rounded-3xl bg-white/30 text-white placeholder-white/70 
             backdrop-blur-md border ${error ? "border-red-500" : "border-white/20"} 
             focus:outline-none transition-all duration-300 
             focus:shadow-lg hover:shadow-lg hover:scale-105 focus:scale-105 
             text-center shadow-white/50`}
         />
-        {error && <p className="text-red-400 text-sm -mt-2">{error}</p>
-        }
+        {error && <p className="text-red-400 text-sm -mt-2">{error}</p>}
 
         <p className="text-white text-lg mt-4">4. Co zrobić:</p>
         <div className="flex flex-row gap-6">
@@ -139,7 +143,7 @@ const AesPage = () => {
         </div>
 
         <p className="text-white text-lg mt-4">5. Wynik:</p>
-       
+
         <div
           className="w-full h-48 bg-white/30 border border-white/20 text-white rounded-3xl backdrop-blur-md 
                         hover:bg-white/25 transition-all duration-300 shadow-lg hover:shadow-2xl flex flex-col items-center justify-center"
