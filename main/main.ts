@@ -90,6 +90,22 @@ app.whenReady().then(() => {
     return rust.decryptAes(text, key);
   });
 
+  ipcMain.handle("rust:generateRSAKeys", () => {
+    return rust.generateRsaKeys();
+  });
+  ipcMain.handle(
+    "rust:encryptRSA",
+    (_event, message: string, n: string, e: string) => {
+      return rust.rsaEncrypt(message, n, e);
+    },
+  );
+  ipcMain.handle(
+    "rust:decryptRSA",
+    (_event, cipher: string, n: string, d: string) => {
+      return rust.rsaDecrypt(cipher, n, d);
+    },
+  );
+
   createWindow();
 });
 

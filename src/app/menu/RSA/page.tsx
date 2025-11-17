@@ -10,37 +10,50 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 const RSAPage = () => {
   const [publicKey, setPublicKey] = useState("");
   const [privateKey, setPrivateKey] = useState("");
-
   const [showGeneratedKeys, setShowGeneratedKeys] = useState(false);
-  const [keyMode, setKeyMode] = useState<"text" | "generate">("text");
   const [message, setMessage] = useState("");
   const [result, setResult] = useState("");
+  const [manual, setManual] = useState(false);
 
-  const generateKeys = () => {
-    const examplePublic = "65537, 3233";
-    const examplePrivate = "2753, 3233";
+  const generateKeys = async () => {
+    try {
+      const keys = await window.api.rust.generateRSAKeys();
+      setPublicKey(`${keys.e},${keys.n}`);
+      setPrivateKey(`${keys.d},${keys.n}`);
 
-    setPublicKey(examplePublic);
-    setPrivateKey(examplePrivate);
-    setShowGeneratedKeys(true);
+      setShowGeneratedKeys(true);
+    } catch {
+      setResult("Błąd generowania kluczy RSA.");
+    }
   };
-
-  const handleEncrypt = () => {
+  const handleEncrypt = async () => {
     if (!message || !publicKey) {
       setResult("Błąd: brak danych lub klucza publicznego.");
       return;
     }
 
-    setResult("SZYFROGRAM (mock RSA)");
+    try {
+      const [e, n] = publicKey.split(",");
+      const cipher = await window.api.rust.encryptRSA(message, n, e);
+      setResult(cipher);
+    } catch {
+      setResult("Błąd podczas szyfrowania RSA.");
+    }
   };
 
-  const handleDecrypt = () => {
+  const handleDecrypt = async () => {
     if (!message || !privateKey) {
-      setResult("Błąd: brak danych lub klucza prywatnego.");
+      setResult("Błąd: brak szyfrogramu lub klucza prywatnego.");
       return;
     }
 
-    setResult("ODSZYFROWANY TEKST (mock RSA)");
+    try {
+      const [d, n] = privateKey.split(",");
+      const plain = await window.api.rust.decryptRSA(message, n, d);
+      setResult(plain);
+    } catch {
+      setResult("Błąd podczas odszyfrowywania RSA.");
+    }
   };
 
   const handleCleanup = () => {
@@ -63,87 +76,101 @@ const RSAPage = () => {
 
         <div className="flex gap-4">
           <button
-            onClick={() => setKeyMode("text")}
-            className={`px-6 py-2 text-white rounded-2xl ${
-              keyMode === "text"
-                ? "bg-white/40 border-2 border-white/60"
-                : "bg-white/20"
-            }`}
+            onClick={() => setManual(true)}
+            className={`px-6 py-2 text-white rounded-2xl ${manual ? "bg-white/40" : "bg-white/20"}`}
           >
             Wpisz klucze
           </button>
 
           <button
-            onClick={() => setKeyMode("generate")}
-            className={`px-6 py-2 text-white rounded-2xl ${
-              keyMode === "generate"
-                ? "bg-white/40 border-2 border-white/60"
-                : "bg-white/20"
-            }`}
+            onClick={() => setManual(false)}
+            className={`px-6 py-2 text-white rounded-2xl ${!manual ? "bg-white/40" : "bg-white/20"}`}
           >
             Wygeneruj klucze
           </button>
         </div>
-        {keyMode === "text" && (
-          <>
-            <p className="text-white text-lg mt-3">Wpisz klucze:</p>
+        <>
+          {manual && (
+            <div className="flex flex-col gap-4 w-full">
+              <p className="text-white text-center font-semibold">
+                Wpisz swoje klucze:
+              </p>
 
-            <div className="flex flex-row gap-4">
-              <input
-                value={publicKey}
-                onChange={(e) => setPublicKey(e.target.value)}
-                className="w-full py-3 px-4 rounded-3xl bg-white/30 text-white placeholder-white/70 
-                     backdrop-blur-md border border-white/20 transition-all duration-300 
-                     hover:shadow-xl hover:scale-105"
-                placeholder="Klucz publiczny "
-                type="text"
-              />
+              <div>
+                <span className="text-white/80 text-sm">
+                  Klucz publiczny (e,n):
+                </span>
+                <input
+                  value={publicKey}
+                  onChange={(e) => setPublicKey(e.target.value)}
+                  className="w-full py-3 px-4 rounded-2xl bg-white/30 text-white"
+                  placeholder="np. 65537,123456789..."
+                />
+              </div>
 
-              <input
-                value={privateKey}
-                onChange={(e) => setPrivateKey(e.target.value)}
-                className="w-full py-3 px-4 rounded-3xl bg-white/30 text-white placeholder-white/70 
-                     backdrop-blur-md border border-white/20 transition-all duration-300 
-                     hover:shadow-xl hover:scale-105"
-                placeholder="Klucz prywatny "
-                type="text"
-              />
+              <div>
+                <span className="text-white/80 text-sm">
+                  Klucz prywatny (d,n):
+                </span>
+                <input
+                  value={privateKey}
+                  onChange={(e) => setPrivateKey(e.target.value)}
+                  className="w-full py-3 px-4 rounded-2xl bg-white/30 text-white"
+                  placeholder="np. 987654321,123456789..."
+                />
+              </div>
             </div>
-          </>
-        )}
-        {keyMode === "generate" && (
-          <>
-            {!showGeneratedKeys && (
-              <button
-                onClick={generateKeys}
-                className="w-full py-3 px-4 bg-white/30 rounded-3xl text-white hover:bg-white/40 
+          )}
+          {!showGeneratedKeys && !manual && (
+            <button
+              onClick={generateKeys}
+              className="w-full py-3 px-4 bg-white/30 rounded-3xl text-white hover:bg-white/40 
                    transition-all duration-300 hover:scale-105"
-              >
-                Generuj klucze...
-              </button>
-            )}
+            >
+              Generuj klucze...
+            </button>
+          )}
 
-            {showGeneratedKeys && (
-              <div className="flex flex-col gap-4 w-full">
-                <p className="text-white text-center">Wygenerowane klucze:</p>
+          {showGeneratedKeys && !manual && (
+            <div className="flex flex-col gap-4 w-full">
+              <p className="text-white text-center font-semibold">
+                Wygenerowano:
+              </p>
 
-                <div className="flex flex-row gap-4">
+              <div className="flex flex-col gap-3">
+                <div>
+                  <span className="text-white/80 text-sm font-semibold block mb-1">
+                    Klucz publiczny (e, n):
+                  </span>
                   <input
                     readOnly
                     value={publicKey}
-                    className="w-full py-3 px-4 rounded-3xl bg-white/30 text-white backdrop-blur-md"
+                    onClick={(e) => e.currentTarget.select()}
+                    className="w-full py-3 px-4 rounded-2xl bg-white/30 text-white text-sm 
+                           backdrop-blur-md border border-white/20 focus:outline-none cursor-pointer
+                           hover:bg-white/40 transition-all"
+                    title="Kliknij aby zaznaczyć"
                   />
+                </div>
 
+                <div>
+                  <span className="text-white/80 text-sm font-semibold block mb-1">
+                    Klucz prywatny (d, n):
+                  </span>
                   <input
                     readOnly
                     value={privateKey}
-                    className="w-full py-3 px-4 rounded-3xl bg-white/30 text-white backdrop-blur-md"
+                    onClick={(e) => e.currentTarget.select()}
+                    className="w-full py-3 px-4 rounded-2xl bg-white/30 text-white text-sm 
+                           backdrop-blur-md border border-white/20 focus:outline-none cursor-pointer
+                           hover:bg-white/40 transition-all"
+                    title="Kliknij aby zaznaczyć"
                   />
                 </div>
               </div>
-            )}
-          </>
-        )}
+            </div>
+          )}
+        </>
         <p className="text-white text-lg mt-4">2. Wiadomość:</p>
 
         <textarea

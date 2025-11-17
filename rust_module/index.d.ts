@@ -15,3 +15,23 @@ export declare function encryptCezar(text: string, shift: number): string;
 export declare function encryptRunningKey(text: string, key: string): string;
 
 export declare function encryptVigenere(text: string, key: string): string;
+
+export declare function generateRsaKeys(): RsaKeyPair;
+
+export declare function rsaDecrypt(
+  cipher: string,
+  n: string,
+  d: string,
+): string;
+
+export declare function rsaEncrypt(
+  message: string,
+  n: string,
+  e: string,
+): string;
+
+export interface RsaKeyPair {
+  n: string;
+  e: string;
+  d: string;
+}

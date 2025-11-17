@@ -15,6 +15,13 @@ declare global {
         decrypt_running_key: (text: string, key: string) => Promise<string>;
         encrypt_aes: (text: string, key: string) => Promise<string>;
         decrypt_aes: (text: string, key: string) => Promise<string>;
+        generateRSAKeys: () => Promise<{
+          n: string;
+          e: string;
+          d: string;
+        }>;
+        encryptRSA: (message: string, n: string, e: string) => Promise<string>;
+        decryptRSA: (cipher: string, n: string, d: string) => Promise<string>;
       };
     };
   }

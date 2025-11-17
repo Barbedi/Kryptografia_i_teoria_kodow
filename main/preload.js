@@ -40,5 +40,14 @@ electron_1.contextBridge.exposeInMainWorld("api", {
     decrypt_aes: function (text, key) {
       return electron_1.ipcRenderer.invoke("rust:decrypt_aes", text, key);
     },
+    generateRSAKeys: function () {
+      return electron_1.ipcRenderer.invoke("rust:generateRSAKeys");
+    },
+    encryptRSA: function (message, n, e) {
+      return electron_1.ipcRenderer.invoke("rust:encryptRSA", message, n, e);
+    },
+    decryptRSA: function (cipher, n, d) {
+      return electron_1.ipcRenderer.invoke("rust:decryptRSA", cipher, n, d);
+    },
   },
 });

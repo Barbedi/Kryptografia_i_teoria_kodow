@@ -21,5 +21,10 @@ contextBridge.exposeInMainWorld("api", {
       ipcRenderer.invoke("rust:encrypt_aes", text, key),
     decrypt_aes: (text: string, key: string) =>
       ipcRenderer.invoke("rust:decrypt_aes", text, key),
+    generateRSAKeys: () => ipcRenderer.invoke("rust:generateRSAKeys"),
+    encryptRSA: (message: string, n: string, e: string) =>
+      ipcRenderer.invoke("rust:encryptRSA", message, n, e),
+    decryptRSA: (cipher: string, n: string, d: string) =>
+      ipcRenderer.invoke("rust:decryptRSA", cipher, n, d),
   },
 });

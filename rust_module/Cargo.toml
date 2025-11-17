@@ -11,6 +11,9 @@ crate-type = ["cdylib"]
 base64 = "0.22.1"
 napi = { version = "3", features = ["napi6"] }
 napi-derive = "3"
+num-bigint = { version = "0.4", features = ["rand"] }
+num-traits = "0.2"
+rand = "0.8"
 
 [build-dependencies]
 napi-build = "2.2.3"
