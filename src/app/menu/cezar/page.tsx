@@ -44,8 +44,8 @@ export default function CezarPage() {
     }
   };
   useEffect(() => {
-    validateKey(shift); 
-  },);
+    validateKey(shift);
+  });
 
   return (
     <div className="flex flex-col items-center justify-center mx-4">
@@ -85,9 +85,7 @@ export default function CezarPage() {
                       text-center shadow-white/50`}
         />
 
-        {error && (
-          <p className="text-red-400 text-sm ">{error}</p>
-        )}
+        {error && <p className="text-red-400 text-sm ">{error}</p>}
         <p className="text-white text-lg mt-4">3. Co zrobić:</p>
         <div className="flex flex-row gap-6">
           <div

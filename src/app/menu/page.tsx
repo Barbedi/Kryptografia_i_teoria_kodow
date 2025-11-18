@@ -15,10 +15,8 @@ const menu = () => {
           title="Szyfr z Kluczem Bieżącym"
           url="/menu/SzyfrzKluczemBiezacym"
         />
-        <Card
-          title="Szyfr AES"
-          url="/menu/aes"
-        />
+        <Card title="Szyfr AES" url="/menu/aes" />
+        <Card title="Szyfr RSA" url="/menu/RSA" />
       </div>
       <Link
         className="inline-block mt-4 px-8 py-3 bg-white/30 border text-lg border-white/20 backdrop-blur-md text-white rounded-2xl hover:bg-white/25 hover:scale-105 active:scale-95 duration-300 transition-all hover:shadow-xl shadow-white/50"

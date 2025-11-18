@@ -83,16 +83,26 @@ app.whenReady().then(() => {
       return rust.decryptRunningKey(text, key);
     },
   );
+  ipcMain.handle("rust:encrypt_aes", (_event, text: string, key: string) => {
+    return rust.encryptAes(text, key);
+  });
+  ipcMain.handle("rust:decrypt_aes", (_event, text: string, key: string) => {
+    return rust.decryptAes(text, key);
+  });
+
+  ipcMain.handle("rust:generateRSAKeys", () => {
+    return rust.generateRsaKeys();
+  });
   ipcMain.handle(
-    "rust:encrypt_aes",
-    (_event, text: string, key: string) => {
-      return rust.encryptAes(text, key);
+    "rust:encryptRSA",
+    (_event, message: string, n: string, e: string) => {
+      return rust.rsaEncrypt(message, n, e);
     },
   );
   ipcMain.handle(
-    "rust:decrypt_aes",
-    (_event, text: string, key: string) => {
-      return rust.decryptAes(text, key);
+    "rust:decryptRSA",
+    (_event, cipher: string, n: string, d: string) => {
+      return rust.rsaDecrypt(cipher, n, d);
     },
   );
 
