@@ -67,7 +67,7 @@ export default function CezarPage() {
   };
   const validateKey = (value: number) => {
     if (value === 0) {
-      setError("Podaj klucz przesunięcia większy od 0.")
+      setError("Podaj klucz przesunięcia większy od 0.");
       addLog("Błąd walidacji: klucz przesunięcia nie może być 0.", "error");
     } else {
       setError(null);

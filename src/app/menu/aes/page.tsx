@@ -47,7 +47,7 @@ const AesPage = () => {
     addLog("Rozpoczynam szyfrowanie AES...", "info");
     const encrypted = await window.api.rust.encrypt_aes(fileContent, key);
     addLog("Zakończono szyfrowanie.", "success");
-    setResult(encrypted); 
+    setResult(encrypted);
   };
 
   const handleDecrypt = async () => {

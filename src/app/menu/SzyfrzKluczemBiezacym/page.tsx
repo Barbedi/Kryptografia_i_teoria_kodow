@@ -41,7 +41,7 @@ export default function CezarPage() {
     if (key.length < fileContent.length) {
       addLog(
         `Błąd: Klucz jest za krótki (tekst: ${fileContent.length}, klucz: ${key.length}).`,
-        "error"
+        "error",
       );
       return;
     }
@@ -64,7 +64,7 @@ export default function CezarPage() {
     if (key.length < fileContent.length) {
       addLog(
         `Błąd: Klucz jest za krótki (tekst: ${fileContent.length}, klucz: ${key.length}).`,
-        "error"
+        "error",
       );
       return;
     }
