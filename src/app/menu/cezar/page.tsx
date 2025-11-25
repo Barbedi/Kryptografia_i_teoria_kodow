@@ -12,61 +12,67 @@ export default function CezarPage() {
   const [fileContent, setFileContent] = useState<string | null>(null);
   const [shift, setShift] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
-const { addLog } = useLogs();
+  const { addLog } = useLogs();
   const handleOpenFile = async () => {
-  addLog("Otwieram okno wyboru pliku...");
-  const result = await window.api.file.open();
-  if (!result) {
-    addLog("Anulowano wybór pliku.");
-    return;
-  }
-
-  addLog(`Załadowano plik: ${result.path}`);
-
-  setFileName(result.path.split("\\").pop() ?? "nieznany");
-  setFileContent(result.content);
-};
-  
-  const handleEncrypt = async () => {
-  if (!fileContent) {
-    addLog("Próba szyfrowania bez pliku – przerwano.");
-    return;
-  }
-
-  addLog("Rozpoczynam szyfrowanie Cezara...");
-  const result = await window.api.rust.encryptCezar(fileContent, shift);
-  addLog("Zakończono szyfrowanie.");
-  setFileContent(result);
-};
-
-  const handleDecrypt = async () => {
-    if (!fileContent) {
-      addLog("Próba odszyfrowywania bez pliku – przerwano.");
+    addLog("Otwieram okno wyboru pliku...", "info");
+    const result = await window.api.file.open();
+    if (!result) {
+      addLog("Anulowano wybór pliku.", "warning");
       return;
     }
 
-    addLog("Rozpoczynam odszyfrowywanie Cezara...");
-    const result = await window.api.rust.decryptCezar(fileContent, shift);
-    addLog("Zakończono odszyfrowywanie.");
+    addLog(`Załadowano plik: ${result.path}`, "success");
+
+    setFileName(result.path.split("\\").pop() ?? "nieznany");
+    setFileContent(result.content);
+  };
+
+  const handleEncrypt = async () => {
+    if (!fileContent) {
+      addLog("Próba szyfrowania bez pliku – przerwano.", "warning");
+      return;
+    }
+    if (error || shift === 0) {
+      addLog("Próba szyfrowania z niepoprawnym kluczem.", "error");
+      return;
+    }
+
+    addLog("Rozpoczynam szyfrowanie Cezara...", "info");
+    const result = await window.api.rust.encryptCezar(fileContent, shift);
+    addLog("Zakończono szyfrowanie.", "success");
     setFileContent(result);
   };
-  const handleClenanup = async () => {
-    addLog("Czyszczenie danych i resetowanie stanu...");
+
+  const handleDecrypt = async () => {
+    if (!fileContent) {
+      addLog("Próba odszyfrowywania bez pliku – przerwano.", "warning");
+      return;
+    }
+    if (error || shift === 0) {
+      addLog("Próba odszyfrowywania z niepoprawnym kluczem.", "error");
+      return;
+    }
+
+    addLog("Rozpoczynam odszyfrowywanie Cezara...", "info");
+    const result = await window.api.rust.decryptCezar(fileContent, shift);
+    addLog("Zakończono odszyfrowywanie.", "success");
+    setFileContent(result);
+  };
+  const handleCleanup = async () => {
+    addLog("Czyszczenie danych i resetowanie stanu...", "clear");
     setFileContent(null);
     setFileName(null);
     setShift(3);
+    setError(null);
   };
   const validateKey = (value: number) => {
-  addLog(`Walidacja klucza przesunięcia: ${value}`);
-  if (value === 0) {
-    setError("Podaj klucz przesunięcia większy od 0.");
-    addLog("Błąd walidacji: klucz przesunięcia nie może być 0.");
-  } else {
-    setError(null);
-    addLog("Klucz przesunięcia jest poprawny.");
-  }
-};
-  
+    if (value === 0) {
+      setError("Podaj klucz przesunięcia większy od 0.")
+      addLog("Błąd walidacji: klucz przesunięcia nie może być 0.", "error");
+    } else {
+      setError(null);
+    }
+  };
 
   return (
     <div className="flex flex-col items-center justify-center mx-4">
@@ -97,10 +103,10 @@ const { addLog } = useLogs();
           max="25"
           value={shift}
           onChange={(e) => {
-  const val = Number(e.target.value);
-  setShift(val);        
-  validateKey(val);     
-}}
+            const val = Number(e.target.value);
+            setShift(val);
+            validateKey(val);
+          }}
           placeholder="Podaj liczbę przesunięcia (np. 3)"
           className={`w-full py-3 px-4 rounded-3xl bg-white/30 text-white placeholder-white/70 
                       backdrop-blur-md border ${error ? "border-red-500" : "border-white/20"} 
@@ -165,7 +171,7 @@ const { addLog } = useLogs();
           Powrót
         </Link>
         <button
-          onClick={handleClenanup}
+          onClick={handleCleanup}
           className="mt-4 px-6 py-2 bg-red-600/30 border border-red-600/20 backdrop-blur-md 
                      text-white rounded-2xl hover:bg-red-600/40 hover:scale-105 active:scale-95 
                      duration-300 transition-all hover:shadow-xl shadow-red-500/50"

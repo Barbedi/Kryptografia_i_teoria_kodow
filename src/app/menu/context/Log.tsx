@@ -2,20 +2,28 @@
 
 import { createContext, useContext, useState } from "react";
 
+export type LogType = "info" | "success" | "error" | "warning" | "clear";
+
+export interface LogEntry {
+  text: string;
+  type: LogType;
+  timestamp: string;
+}
+
 interface LogContextType {
-  logs: string[];
-  addLog: (text: string) => void;
+  logs: LogEntry[];
+  addLog: (text: string, type?: LogType) => void;
   clearLogs: () => void;
 }
 
 const LogContext = createContext<LogContextType | null>(null);
 
 export function LogProvider({ children }: { children: React.ReactNode }) {
-  const [logs, setLogs] = useState<string[]>([]);
+  const [logs, setLogs] = useState<LogEntry[]>([]);
 
-  const addLog = (text: string) => {
+  const addLog = (text: string, type: LogType = "info") => {
     const timestamp = new Date().toLocaleTimeString("pl-PL");
-    setLogs(prev => [`[${timestamp}] ${text}`, ...prev]);
+    setLogs((prev) => [{ text, type, timestamp }, ...prev]);
   };
 
   const clearLogs = () => setLogs([]);
