@@ -5,6 +5,7 @@ import LockIcon from "@mui/icons-material/Lock";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { useLogs } from "../context/Log";
 
 const AesPage = () => {
   const [fileName, setFileName] = useState<string | null>(null);
@@ -14,9 +15,16 @@ const AesPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [inputMode, setInputMode] = useState<"file" | "text">("text");
 
+  const { addLog } = useLogs();
+
   const handleOpenFile = async () => {
+    addLog("Otwieram okno wyboru pliku...", "info");
     const result = await window.api.file.open();
-    if (!result) return;
+    if (!result) {
+      addLog("Anulowano wybór pliku.", "warning");
+      return;
+    }
+    addLog(`Załadowano plik: ${result.path}`, "success");
     setFileName(result.path.split("\\").pop() ?? "nieznany");
     setFileContent(result.content);
   };
@@ -27,18 +35,39 @@ const AesPage = () => {
   };
 
   const handleEncrypt = async () => {
-    if (!fileContent || error) return;
+    if (!fileContent) {
+      addLog("Próba szyfrowania bez treści – przerwano.", "warning");
+      return;
+    }
+    if (error || key.length !== 16) {
+      addLog("Próba szyfrowania z niepoprawnym kluczem.", "error");
+      return;
+    }
+
+    addLog("Rozpoczynam szyfrowanie AES...", "info");
     const encrypted = await window.api.rust.encrypt_aes(fileContent, key);
-    setResult(encrypted); // zapisz wynik osobno
+    addLog("Zakończono szyfrowanie.", "success");
+    setResult(encrypted); 
   };
 
   const handleDecrypt = async () => {
-    if (!fileContent || error) return;
+    if (!fileContent) {
+      addLog("Próba odszyfrowywania bez treści – przerwano.", "warning");
+      return;
+    }
+    if (error || key.length !== 16) {
+      addLog("Próba odszyfrowywania z niepoprawnym kluczem.", "error");
+      return;
+    }
+
+    addLog("Rozpoczynam odszyfrowywanie AES...", "info");
     const decrypted = await window.api.rust.decrypt_aes(fileContent, key);
-    setResult(decrypted); // zapisz wynik osobno
+    addLog("Zakończono odszyfrowywanie.", "success");
+    setResult(decrypted);
   };
 
   const handleCleanup = () => {
+    addLog("Czyszczenie danych i resetowanie stanu...", "clear");
     setFileContent(null);
     setFileName(null);
     setResult(null);

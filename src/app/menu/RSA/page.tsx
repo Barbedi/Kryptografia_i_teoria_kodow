@@ -6,6 +6,7 @@ import LockIcon from "@mui/icons-material/Lock";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { useLogs } from "../context/Log";
 
 const RSAPage = () => {
   const [publicKey, setPublicKey] = useState("");
@@ -15,48 +16,67 @@ const RSAPage = () => {
   const [result, setResult] = useState("");
   const [manual, setManual] = useState(false);
 
+  const { addLog } = useLogs();
+
   const generateKeys = async () => {
+    addLog("Generowanie nowej pary kluczy RSA...", "info");
     try {
       const keys = await window.api.rust.generateRSAKeys();
       setPublicKey(`${keys.e},${keys.n}`);
       setPrivateKey(`${keys.d},${keys.n}`);
 
       setShowGeneratedKeys(true);
+      addLog("Wygenerowano klucze RSA pomyślnie.", "success");
     } catch {
-      setResult("Błąd generowania kluczy RSA.");
+      const msg = "Błąd generowania kluczy RSA.";
+      setResult(msg);
+      addLog(msg, "error");
     }
   };
   const handleEncrypt = async () => {
     if (!message || !publicKey) {
-      setResult("Błąd: brak danych lub klucza publicznego.");
+      const msg = "Błąd: brak danych lub klucza publicznego.";
+      setResult(msg);
+      addLog(msg, "error");
       return;
     }
 
+    addLog("Rozpoczynam szyfrowanie RSA...", "info");
     try {
       const [e, n] = publicKey.split(",");
       const cipher = await window.api.rust.encryptRSA(message, n, e);
       setResult(cipher);
+      addLog("Zakończono szyfrowanie.", "success");
     } catch {
-      setResult("Błąd podczas szyfrowania RSA.");
+      const msg = "Błąd podczas szyfrowania RSA.";
+      setResult(msg);
+      addLog(msg, "error");
     }
   };
 
   const handleDecrypt = async () => {
     if (!message || !privateKey) {
-      setResult("Błąd: brak szyfrogramu lub klucza prywatnego.");
+      const msg = "Błąd: brak szyfrogramu lub klucza prywatnego.";
+      setResult(msg);
+      addLog(msg, "error");
       return;
     }
 
+    addLog("Rozpoczynam odszyfrowywanie RSA...", "info");
     try {
       const [d, n] = privateKey.split(",");
       const plain = await window.api.rust.decryptRSA(message, n, d);
       setResult(plain);
+      addLog("Zakończono odszyfrowywanie.", "success");
     } catch {
-      setResult("Błąd podczas odszyfrowywania RSA.");
+      const msg = "Błąd podczas odszyfrowywania RSA.";
+      setResult(msg);
+      addLog(msg, "error");
     }
   };
 
   const handleCleanup = () => {
+    addLog("Czyszczenie danych i resetowanie stanu...", "clear");
     setPublicKey("");
     setPrivateKey("");
     setMessage("");
