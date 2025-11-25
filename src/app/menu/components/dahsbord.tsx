@@ -2,14 +2,81 @@
 import { useState } from "react";
 import TerminalIcon from "@mui/icons-material/Terminal";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import ReportIcon from '@mui/icons-material/Report';
+import ReportIcon from "@mui/icons-material/Report";
 import WarningIcon from "@mui/icons-material/Warning";
 import InfoIcon from "@mui/icons-material/Info";
+import CancelIcon from "@mui/icons-material/Cancel";
+import SaveAltIcon from "@mui/icons-material/SaveAlt";
 import { useLogs } from "../context/Log";
+
+import { usePathname } from "next/navigation";
 
 export default function RightDashboard() {
   const [open, setOpen] = useState(false);
-  const { logs } = useLogs();
+  const { logs, addLog } = useLogs();
+  const pathname = usePathname();
+
+  const handleSaveLogs = async () => {
+    addLog("Rozpoczynam zapis logów...", "info");
+    const now = new Date().toLocaleTimeString();
+    const logContent =
+      `[${now}] [INFO]: Rozpoczynam zapis logów...` +
+      "\n" +
+      logs
+        .map(
+          (log) =>
+            `[${log.timestamp}] [${log.type.toUpperCase()}]: ${log.text}`,
+        )
+        .join("\n");
+
+    const date = new Date().toISOString().split("T")[0];
+    const name = pathname?.split("/").pop() || "unknown";
+    const fileName = `logs_${name}_${date}.txt`;
+
+    try {
+      // @ts-expect-error showSaveFilePicker is not yet in standard TS lib
+      if (window.showSaveFilePicker) {
+        // @ts-expect-error showSaveFilePicker is not yet in standard TS lib
+        const handle = await window.showSaveFilePicker({
+          suggestedName: fileName,
+          types: [
+            {
+              description: "Text Files",
+              accept: { "text/plain": [".txt"] },
+            },
+          ],
+        });
+        const writable = await handle.createWritable();
+        await writable.write(logContent);
+        await writable.close();
+        addLog(`Logi zapisane do pliku: ${fileName}`, "success");
+      } else {
+        const blob = new Blob([logContent], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        addLog(`Logi zapisane do pliku: ${fileName}`, "success");
+      }
+      setOpen(false);
+    } catch (error: unknown) {
+      if (error instanceof Error && error.name === "AbortError") {
+        addLog(
+          "Zapisywanie logów zostało przerwane przez użytkownika.",
+          "warning",
+        );
+      } else {
+        addLog(
+          `Nie udało się zapisać logów: ${error instanceof Error ? error.message : String(error)}`,
+          "error",
+        );
+      }
+    }
+  };
 
   return (
     <>
@@ -76,6 +143,29 @@ export default function RightDashboard() {
               );
             })}
           </div>
+          <div className="flex flex-row gap-2 justify-center items-center mb-4  ">
+            <button
+              className="w-full bg-red-500/20 hover:bg-red-500/40 transition-colors  text-white p-2 rounded-md mt-4"
+              onClick={() => setOpen(false)}
+            >
+              <CancelIcon
+                className="mr-1 justify-center items-center flex flex-row"
+                fontSize="small"
+              />
+              Zamknij
+            </button>
+            <button
+              className="w-full bg-green-500/20 hover:bg-green-500/40 transition-colors  text-white p-2 rounded-md mt-4"
+              onClick={handleSaveLogs}
+            >
+              <SaveAltIcon
+                className="mr-1 justify-center items-center flex flex-row"
+                fontSize="small"
+              />
+              Zapisz
+            </button>
+          </div>
+          s
         </div>
       </div>
     </>
