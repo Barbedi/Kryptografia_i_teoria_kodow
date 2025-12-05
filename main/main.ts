@@ -106,6 +106,25 @@ app.whenReady().then(() => {
     },
   );
 
+  ipcMain.handle("rust:ecdhGeneratePrivateKey", () => {
+    return rust.ecdhGeneratePrivateKey();
+  });
+
+  ipcMain.handle("rust:ecdhGetPublicKey", (_event, privateKey: string) => {
+    return rust.ecdhGetPublicKey(privateKey);
+  });
+
+  ipcMain.handle(
+    "rust:ecdhComputeSharedSecret",
+    (_event, myPrivateKey: string, peerPublicKey: string) => {
+      return rust.ecdhComputeSharedSecret(myPrivateKey, peerPublicKey);
+    },
+  );
+
+  ipcMain.handle("rust:ecdhDeriveKeySha256", (_event, sharedSecret: string) => {
+    return rust.ecdhDeriveKeySha256(sharedSecret);
+  });
+
   createWindow();
 });
 

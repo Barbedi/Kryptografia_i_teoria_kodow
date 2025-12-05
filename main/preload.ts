@@ -26,5 +26,13 @@ contextBridge.exposeInMainWorld("api", {
       ipcRenderer.invoke("rust:encryptRSA", message, n, e),
     decryptRSA: (cipher: string, n: string, d: string) =>
       ipcRenderer.invoke("rust:decryptRSA", cipher, n, d),
+    ecdhGeneratePrivateKey: () =>
+      ipcRenderer.invoke("rust:ecdhGeneratePrivateKey"),
+    ecdhGetPublicKey: (privateKey: string) =>
+      ipcRenderer.invoke("rust:ecdhGetPublicKey", privateKey),
+    ecdhComputeSharedSecret: (myPrivateKey: string, peerPublicKey: string) =>
+      ipcRenderer.invoke("rust:ecdhComputeSharedSecret", myPrivateKey, peerPublicKey),
+    ecdhDeriveKeySha256: (sharedSecret: string) =>
+      ipcRenderer.invoke("rust:ecdhDeriveKeySha256", sharedSecret),
   },
 });

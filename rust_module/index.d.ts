@@ -8,6 +8,14 @@ export declare function decryptRunningKey(text: string, key: string): string
 
 export declare function decryptVigenere(text: string, key: string): string
 
+export declare function ecdhComputeSharedSecret(myPrivateKeyB64: string, peerPublicKeyB64: string): string
+
+export declare function ecdhDeriveKeySha256(sharedSecretB64: string): string
+
+export declare function ecdhGeneratePrivateKey(): string
+
+export declare function ecdhGetPublicKey(privateKeyB64: string): string
+
 export declare function encryptAes(text: string, key: string): string
 
 export declare function encryptCezar(text: string, shift: number): string

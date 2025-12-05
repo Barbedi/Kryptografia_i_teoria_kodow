@@ -37,5 +37,17 @@ electron_1.contextBridge.exposeInMainWorld("api", {
         decryptRSA: function (cipher, n, d) {
             return electron_1.ipcRenderer.invoke("rust:decryptRSA", cipher, n, d);
         },
+        ecdhGeneratePrivateKey: function () {
+            return electron_1.ipcRenderer.invoke("rust:ecdhGeneratePrivateKey");
+        },
+        ecdhGetPublicKey: function (privateKey) {
+            return electron_1.ipcRenderer.invoke("rust:ecdhGetPublicKey", privateKey);
+        },
+        ecdhComputeSharedSecret: function (myPrivateKey, peerPublicKey) {
+            return electron_1.ipcRenderer.invoke("rust:ecdhComputeSharedSecret", myPrivateKey, peerPublicKey);
+        },
+        ecdhDeriveKeySha256: function (sharedSecret) {
+            return electron_1.ipcRenderer.invoke("rust:ecdhDeriveKeySha256", sharedSecret);
+        },
     },
 });

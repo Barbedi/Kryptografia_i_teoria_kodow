@@ -15,25 +15,49 @@ const ECDHPage = () => {
   const [sharedSecret, setSharedSecret] = useState("");
 
   const generateKeys = async () => {
-    addLog("Generowanie pary kluczy ECDH...", "info");
-   
-
-
-
-    addLog("Wygenerowano klucze ECDH!", "success");
+    try {
+      addLog("Generowanie pary kluczy ECDH...", "info");
+      
+      const privateKey = await window.api.rust.ecdhGeneratePrivateKey();
+      const publicKey = await window.api.rust.ecdhGetPublicKey(privateKey);
+      
+      setOwnPrivateKey(privateKey);
+      setOwnPublicKey(publicKey);
+      setError(null);
+      
+      addLog("Wygenerowano klucze ECDH!", "success");
+      addLog(`Klucz prywatny wygenrowano`, "info");
+      addLog(`Klucz publiczny: ${publicKey.substring(0, 20)}...`, "info");
+    } catch {
+      addLog("Błąd podczas generowania kluczy.", "error");
+      setError("Błąd, Otwórz konsolę logów dla szczegółów.");
+    }
   };
 
   const calculateSecret = async () => {
     try {
+      if (!ownPrivateKey || !remotePublicKey) {
+        addLog("Brak wymaganych kluczy.", "error");
+        setError("Błąd, Otwórz konsolę logów dla szczegółów.");
+        return;
+      }
+      
       addLog("Obliczanie wspólnego sekretu...", "info");
-
-     
-
+      
+      const secret = await window.api.rust.ecdhComputeSharedSecret(
+        ownPrivateKey,
+        remotePublicKey.trim()
+      );
+      
+      const derivedKey = await window.api.rust.ecdhDeriveKeySha256(secret);
+      
+      setSharedSecret(derivedKey);
+      setError(null);
+      
       addLog("Wspólny sekret obliczony!", "success");
-
-    } catch (error) {
-      setError("❌ Błąd podczas obliczania sekretu.");
-      addLog("❌ Błąd podczas obliczania sekretu.", "error");
+    } catch {
+      setError("Błąd, Otwórz konsolę logów dla szczegółów.");
+      addLog("Błąd podczas obliczania sekretu.", "error");
     }
   };
 
@@ -43,6 +67,7 @@ const ECDHPage = () => {
     setOwnPrivateKey("");
     setRemotePublicKey("");
     setSharedSecret("");
+    setError(null);
   };
 
   return (
@@ -61,7 +86,7 @@ const ECDHPage = () => {
                      border border-white/20 focus:outline-none transition-all duration-300 
                      hover:shadow-xl hover:scale-105 focus:shadow-2xl shadow-white/50"
         >
-          🔑 Generuj moje klucze
+          Generuj moje klucze
         </button>
 
         {ownPublicKey && (
@@ -97,7 +122,7 @@ const ECDHPage = () => {
                      border border-white/20 focus:outline-none transition-all duration-300 
                      hover:shadow-xl hover:scale-105 focus:shadow-2xl shadow-white/50"
         >
-          ⚡ Oblicz wspólny sekret
+          Oblicz wspólny sekret
         </button>
 
         {sharedSecret && (
