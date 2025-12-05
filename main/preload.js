@@ -2,52 +2,52 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var electron_1 = require("electron");
 electron_1.contextBridge.exposeInMainWorld("api", {
-  file: {
-    open: function () {
-      return electron_1.ipcRenderer.invoke("file:open");
+    file: {
+        open: function () { return electron_1.ipcRenderer.invoke("file:open"); },
     },
-  },
-  rust: {
-    encryptCezar: function (text, shift) {
-      return electron_1.ipcRenderer.invoke("rust:encryptCezar", text, shift);
+    rust: {
+        encryptCezar: function (text, shift) {
+            return electron_1.ipcRenderer.invoke("rust:encryptCezar", text, shift);
+        },
+        decryptCezar: function (text, shift) {
+            return electron_1.ipcRenderer.invoke("rust:decryptCezar", text, shift);
+        },
+        encryptVigenere: function (text, key) {
+            return electron_1.ipcRenderer.invoke("rust:encryptVigenere", text, key);
+        },
+        decryptVigenere: function (text, key) {
+            return electron_1.ipcRenderer.invoke("rust:decryptVigenere", text, key);
+        },
+        encrypt_running_key: function (text, key) {
+            return electron_1.ipcRenderer.invoke("rust:encrypt_running_key", text, key);
+        },
+        decrypt_running_key: function (text, key) {
+            return electron_1.ipcRenderer.invoke("rust:decrypt_running_key", text, key);
+        },
+        encrypt_aes: function (text, key) {
+            return electron_1.ipcRenderer.invoke("rust:encrypt_aes", text, key);
+        },
+        decrypt_aes: function (text, key) {
+            return electron_1.ipcRenderer.invoke("rust:decrypt_aes", text, key);
+        },
+        generateRSAKeys: function () { return electron_1.ipcRenderer.invoke("rust:generateRSAKeys"); },
+        encryptRSA: function (message, n, e) {
+            return electron_1.ipcRenderer.invoke("rust:encryptRSA", message, n, e);
+        },
+        decryptRSA: function (cipher, n, d) {
+            return electron_1.ipcRenderer.invoke("rust:decryptRSA", cipher, n, d);
+        },
+        ecdhGeneratePrivateKey: function () {
+            return electron_1.ipcRenderer.invoke("rust:ecdhGeneratePrivateKey");
+        },
+        ecdhGetPublicKey: function (privateKey) {
+            return electron_1.ipcRenderer.invoke("rust:ecdhGetPublicKey", privateKey);
+        },
+        ecdhComputeSharedSecret: function (myPrivateKey, peerPublicKey) {
+            return electron_1.ipcRenderer.invoke("rust:ecdhComputeSharedSecret", myPrivateKey, peerPublicKey);
+        },
+        ecdhDeriveKeySha256: function (sharedSecret) {
+            return electron_1.ipcRenderer.invoke("rust:ecdhDeriveKeySha256", sharedSecret);
+        },
     },
-    decryptCezar: function (text, shift) {
-      return electron_1.ipcRenderer.invoke("rust:decryptCezar", text, shift);
-    },
-    encryptVigenere: function (text, key) {
-      return electron_1.ipcRenderer.invoke("rust:encryptVigenere", text, key);
-    },
-    decryptVigenere: function (text, key) {
-      return electron_1.ipcRenderer.invoke("rust:decryptVigenere", text, key);
-    },
-    encrypt_running_key: function (text, key) {
-      return electron_1.ipcRenderer.invoke(
-        "rust:encrypt_running_key",
-        text,
-        key,
-      );
-    },
-    decrypt_running_key: function (text, key) {
-      return electron_1.ipcRenderer.invoke(
-        "rust:decrypt_running_key",
-        text,
-        key,
-      );
-    },
-    encrypt_aes: function (text, key) {
-      return electron_1.ipcRenderer.invoke("rust:encrypt_aes", text, key);
-    },
-    decrypt_aes: function (text, key) {
-      return electron_1.ipcRenderer.invoke("rust:decrypt_aes", text, key);
-    },
-    generateRSAKeys: function () {
-      return electron_1.ipcRenderer.invoke("rust:generateRSAKeys");
-    },
-    encryptRSA: function (message, n, e) {
-      return electron_1.ipcRenderer.invoke("rust:encryptRSA", message, n, e);
-    },
-    decryptRSA: function (cipher, n, d) {
-      return electron_1.ipcRenderer.invoke("rust:decryptRSA", cipher, n, d);
-    },
-  },
 });

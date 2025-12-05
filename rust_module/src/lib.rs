@@ -5,9 +5,11 @@ mod aes;
 mod aes_tables; 
 mod aes_rounds;
 mod rsa_key;
+mod ecdh;
 
 pub use cezar::{decrypt_cezar, encrypt_cezar};
 pub use vigenere::{decrypt_vigenere, encrypt_vigenere};
 pub use runningkey::{decrypt_running_key, encrypt_running_key};
 pub use aes::{decrypt_aes, encrypt_aes};
 pub use rsa_key::{generate_rsa_keys};
+pub use ecdh::{ecdh_generate_private_key, ecdh_get_public_key, ecdh_compute_shared_secret, ecdh_derive_key_sha256};

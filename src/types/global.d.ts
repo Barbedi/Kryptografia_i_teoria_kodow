@@ -22,6 +22,10 @@ declare global {
         }>;
         encryptRSA: (message: string, n: string, e: string) => Promise<string>;
         decryptRSA: (cipher: string, n: string, d: string) => Promise<string>;
+        ecdhGeneratePrivateKey: () => Promise<string>;
+        ecdhGetPublicKey: (privateKey: string) => Promise<string>;
+        ecdhComputeSharedSecret: (myPrivateKey: string, peerPublicKey: string) => Promise<string>;
+        ecdhDeriveKeySha256: (sharedSecret: string) => Promise<string>;
       };
     };
   }
