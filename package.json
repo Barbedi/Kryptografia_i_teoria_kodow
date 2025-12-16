@@ -13,6 +13,19 @@
     "format:check": "prettier --check .",
     "lint": "eslint"
   },
+  "build": {
+  "appId": "pl.ans.kryptografia",
+  "productName": "Kryptografia i teoria kodów",
+  "directories": { "output": "dist" },
+  "files": [
+  "main/**",
+  "out/**",
+  "public/**",
+  "package.json",
+  "rust_module/**"
+],
+  "win": { "target": "nsis" }
+},
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
